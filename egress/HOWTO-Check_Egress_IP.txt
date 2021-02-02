@@ -1,0 +1,80 @@
+How to check egress IP on all namespaces
+
+- On Ansible host czcholspc004001.prg-dc.com do:
+
+$ mkdir -p /backup/egress/
+
+
+$ cat > clusterrole-for-svc-its-egress-check.yml << EOF
+apiVersion: authorization.openshift.io/v1
+kind: ClusterRole
+metadata:
+  annotations:
+    openshift.io/description: Additional permissions for SA svc-its-egress-check
+    openshift.io/reconcile-protect: "true"
+  creationTimestamp: "2020-05-27T12:40:36Z"
+  name: clusterrole-for-svc-its-egress-check
+  resourceVersion: "312632476"
+  selfLink: /apis/authorization.openshift.io/v1/clusterroles/clusterrole-for-svc-its-egress-check
+  uid: 43a730c6-a017-11ea-bea4-00505698129b
+rules:
+- apiGroups:
+  - ""
+  attributeRestrictions: null
+  resources:
+  - pods
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - ""
+  attributeRestrictions: null
+  resources:
+  - pods/exec
+  verbs:
+  - create
+- apiGroups:
+  - ""
+  attributeRestrictions: null
+  resources:
+  - namespaces
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - network.openshift.io
+  attributeRestrictions: null
+  resources:
+  - netnamespaces
+  verbs:
+  - get
+  - list
+EOF
+
+oc -n cloudmgmt create sa svc-its-egress-check
+oc create -f clusterrole-for-svc-its-egress-check.yml
+oc -n cloudmgmt adm policy add-cluster-role-to-user clusterrole-for-svc-its-egress-check -z svc-its-egress-check
+
+- To make script check_egress.sh work authentication token needs to be
+  placed in a file where script will find it. Run command on Ansible host to
+  get authentication token and put it in "~/sa_egress_token" under account which is
+  running backup script on the backup machine.
+
+oc -n cloudmgmt sa get-token svc-its-egress-check
+
+
+alias oc='oc --token=$(cat ~/sa_egress_token)'
+
+
+oc login https://prod1-ocp-cb.prg-dc.com
+oc whoami
+system:serviceaccount:cloudmgmt:svc-its-egress-check
+
+Git repo: To be filled
+
+- Verify script functionality.
+- Create cronjob
+  - Copy to /etc/ansible/scripts
+  - Create link: ln -s /etc/ansible/scripts/check_egress.sh /usr/local/bin/check_egress.sh
+  - sudo cat >/etc/cron.d/check_egress
+  */5 * * * * root /usr/local/bin/check_egress.sh

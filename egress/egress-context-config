@@ -1,0 +1,17 @@
+apiVersion: v1
+clusters:
+- cluster:
+    server: https://prod1-ocp.prg-dc.com:443
+  name: prod1-ocp-prg-dc--com:443
+contexts:
+- context:
+    cluster: prod1-ocp-prg-dc--com:443
+    namespace: ""
+    user: system:serviceaccount:cloudmgmt:svc-its-egress-check/prod1-ocp-cb-prg-dc--com:443
+  name: /prod1-ocp-prg-dc--com:443/system:serviceaccount:cloudmgmt:svc-its-egress-check
+current-context: /prod1-ocp-prg-dc--com:443/system:serviceaccount:cloudmgmt:svc-its-egress-check
+kind: Config
+preferences: {}
+users:
+- name: system:serviceaccount:cloudmgmt:svc-its-egress-check/prod1-ocp-prg-dc--com:443
+  user: {}

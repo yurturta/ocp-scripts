@@ -1,0 +1,11 @@
+correct_egress
+pod_was_not_found
+curl_not_found
+command terminated with exit code 126
+system:serviceaccount:cloudmgmt:svc-its-egress-check
+exec operation is not allowed because the pod's security context exceeds your permissions:
+invalid_ip
+wrong_egress
+unable to upgrade connection
+Defaulting container name
+oc describe pod
